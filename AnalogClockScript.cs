@@ -18,10 +18,18 @@ using UnityEngine.UI;
 // 64,800 seconds   = 180 degrees
 // 75,600 seconds   = 270 degrees
 // 86,400 seconds   = 360 degrees / 0 degrees
+//
+// Degrees of rotation per second = 0.008333333
+// CurrentTimeInSeconds * 0.008333333 = Degrees of rotation for the current time.
+//
+// IF CurrentTimeInSeconds > 43,200 seconds
+//      CurrentTimeInSeconds -= 43,200 seconds
+//      Assuming rotation greater than 360 degrees is a problem, this may be needed.
+//
+// GameObjects need to be rotated on the Z axis.
 
 public class AnalogClockScript : MonoBehaviour
 {
-    TimeSpan time;
     Image hourHand;
     Image minuteHand;
     Image secondHand;
@@ -29,18 +37,28 @@ public class AnalogClockScript : MonoBehaviour
 
     void Start()
     {
-        time = DateTime.Now.TimeOfDay;
         Debug.Log(DateTime.Now.TimeOfDay.TotalSeconds / 86400);
 
         hourHand = GameObject.Find("HourHand").GetComponent<Image>();
-        minuteHand = GameObject.Find("MinuteHand").GetComponent<Image>();
-        secondHand = GameObject.Find("SecondHand").GetComponent<Image>();
+        // minuteHand = GameObject.Find("MinuteHand").GetComponent<Image>();
+        // secondHand = GameObject.Find("SecondHand").GetComponent<Image>();
 
         pivotPoint = GameObject.Find("PivotPoint");
+
+        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, (5400f * 0.008333333f) - 135f); // 3:00 AM
+        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, (21600f * 0.008333333f) - 90f); // 9:00 AM
+
+        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, GetDegreesOfRotation() - 180f);
     }
 
     void Update()
     {
-        
+        Debug.Log(GetDegreesOfRotation());
+        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, GetDegreesOfRotation());
+    }
+
+    static public float GetDegreesOfRotation()
+    {
+        return (float)DateTime.Now.TimeOfDay.TotalSeconds * 0.008333333f;
     }
 }
