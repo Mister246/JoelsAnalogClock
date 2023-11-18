@@ -61,47 +61,52 @@ public class AnalogClockScript : MonoBehaviour
     GameObject pivotPoint;
     static string pivotPointName = "PivotPoint";
 
+    float currentTime;
+
     void Start()
     {
-        Debug.Log(DateTime.Now.TimeOfDay.TotalSeconds / 86400);
+        Application.runInBackground = true;
+
+        currentTime = (float)DateTime.Now.TimeOfDay.TotalSeconds;
 
         hourHand = GameObject.Find(hourHandName).GetComponent<Image>();
         minuteHand = GameObject.Find(minuteHandName).GetComponent<Image>();
         secondHand = GameObject.Find(secondHandName).GetComponent<Image>();
         pivotPoint = GameObject.Find(pivotPointName);
 
-        hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(hourHand));
-        minuteHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(minuteHand));
-        secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(secondHand));
+        hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(hourHand, currentTime));
+        minuteHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(minuteHand, currentTime));
+        secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(secondHand, currentTime));
 
-        Debug.Log(-GetDegreesOfRotation(secondHand));
+        // Debug.Log(-GetDegreesOfRotation(secondHand));
         // Debug.Log(-GetDegreesOfRotation(secondHand) - secondHand.transform.eulerAngles.z);
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        // Debug.Log(-GetDegreesOfRotation(secondHand) - secondHand.transform.eulerAngles.z);
-        // secondHand.transform.rotation = Quaternion.Euler(0f, 0f, -GetDegreesOfRotation(secondHand) + secondHand.transform.rotation.z);
+        currentTime = (float)DateTime.Now.TimeOfDay.TotalSeconds;
+        // Debug.Log(-GetDegreesOfRotation(secondHand, currentTime) + GetDegreesOfRotation(secondHand, currentTime - Time.deltaTime));
+        secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(secondHand, currentTime) + GetDegreesOfRotation(secondHand, currentTime - Time.deltaTime));
     }
 
-    static public float GetDegreesOfRotation(Image hand)
+    static public float GetDegreesOfRotation(Image hand, float currentTime)
     // Returns the degrees of rotation of the hand given for the current time.
     // Degrees of rotation returned are between 0 and 360. 
     {
         if (hand.name == hourHandName)
         // IF given the hour hand.
         {
-            return (float)DateTime.Now.TimeOfDay.TotalSeconds * hourHandSecondToDegreesRatio % 360f;
+            return currentTime * hourHandSecondToDegreesRatio % 360f;
         }
         else if (hand.name == minuteHandName)
         // IF given the minute hand.
         {
-            return (float)DateTime.Now.TimeOfDay.TotalSeconds * minuteHandSecondToDegreesRatio % 360f;
+            return currentTime * minuteHandSecondToDegreesRatio % 360f;
         }
         else if (hand.name == secondHandName)
         // IF given the second hand.
         {
-            return (float)DateTime.Now.TimeOfDay.TotalSeconds * secondHandSecondToDegreesRatio % 360f;
+            return currentTime * secondHandSecondToDegreesRatio % 360f;
         }
 
         // If reached this point, something has gone wrong.
