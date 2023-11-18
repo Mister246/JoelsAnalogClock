@@ -27,6 +27,8 @@ using UnityEngine.UI;
 //      Assuming rotation greater than 360 degrees is a problem, this may be needed.
 //
 // GameObjects need to be rotated on the Z axis.
+//
+// Degrees should be made negative, as positive rotations are counter-clockwise.
 
 public class AnalogClockScript : MonoBehaviour
 {
@@ -45,15 +47,16 @@ public class AnalogClockScript : MonoBehaviour
 
         pivotPoint = GameObject.Find("PivotPoint");
 
-        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, (5400f * 0.008333333f) - 135f); // 3:00 AM
-        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, (21600f * 0.008333333f) - 90f); // 9:00 AM
+        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -(5400f * 0.008333333f)); // 1:30 AM, 45 degrees
+        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -(10800f * 0.008333333f)); // 3:00 AM, 90 degrees
+        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -(21600f * 0.008333333f)); // 6:00 AM, 180 degrees
 
-        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, GetDegreesOfRotation() - 180f);
+        hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation());
     }
 
     void Update()
     {
-        Debug.Log(GetDegreesOfRotation());
+        // Debug.Log(GetDegreesOfRotation());
         // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, GetDegreesOfRotation());
     }
 
