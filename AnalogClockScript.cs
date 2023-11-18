@@ -57,6 +57,8 @@ public class AnalogClockScript : MonoBehaviour
     static string secondHandName = "SecondHand";
     const float secondHandSecondToDegreesRatio = 6f;
     // Represents how many degrees per second the second hand rotates.
+    float secondHandDeltaRotation;
+    // Represents the difference in rotation between this frame and last frame for the second hand.
 
     GameObject pivotPoint;
     static string pivotPointName = "PivotPoint";
@@ -78,6 +80,9 @@ public class AnalogClockScript : MonoBehaviour
         minuteHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(minuteHand, currentTime));
         secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(secondHand, currentTime));
 
+        secondHandDeltaRotation = -GetDegreesOfRotation(secondHand, currentTime) + GetDegreesOfRotation(secondHand, currentTime - Time.fixedDeltaTime);
+        // Represents the difference in rotation between this frame and last frame for the second hand.
+
         // Debug.Log(-GetDegreesOfRotation(secondHand));
         // Debug.Log(-GetDegreesOfRotation(secondHand) - secondHand.transform.eulerAngles.z);
     }
@@ -85,8 +90,8 @@ public class AnalogClockScript : MonoBehaviour
     void FixedUpdate()
     {
         currentTime = (float)DateTime.Now.TimeOfDay.TotalSeconds;
-        // Debug.Log(-GetDegreesOfRotation(secondHand, currentTime) + GetDegreesOfRotation(secondHand, currentTime - Time.deltaTime));
-        secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(secondHand, currentTime) + GetDegreesOfRotation(secondHand, currentTime - Time.deltaTime));
+
+        secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, secondHandDeltaRotation);
     }
 
     static public float GetDegreesOfRotation(Image hand, float currentTime)
