@@ -8,6 +8,7 @@ using UnityEngine.UI;
 // A full day is 86,400 seconds.
 // A full hour is 3600 seconds.
 // 
+// Hour hand time table:
 // 0 seconds        = 0 degrees
 // 5400 seconds     = 45 degrees
 // 10,800 seconds   = 90 degrees
@@ -19,39 +20,59 @@ using UnityEngine.UI;
 // 75,600 seconds   = 270 degrees
 // 86,400 seconds   = 360 degrees / 0 degrees
 //
-// Degrees of rotation per second = 0.008333333
-// CurrentTimeInSeconds * 0.008333333 = Degrees of rotation for the current time.
+// Degrees of rotation per second = 0.008333333 degrees
+// CurrentTimeInSeconds * 0.008333333 = Degrees of rotation for hour hand.
 //
-// IF CurrentTimeInSeconds > 43,200 seconds
-//      CurrentTimeInSeconds -= 43,200 seconds
-//      Assuming rotation greater than 360 degrees is a problem, this may be needed.
+// Minute hand time table:
+// 0 seconds        = 0 degrees
+// 900 seconds      = 90 degrees
+// 
+// Degrees of rotation per second = 0.1 degrees
+// CurrentTimeInSeconds * 0.1 = Degrees of rotation for minute hand.
+// 
+// Second hand time table:
+// 0 seconds        = 0 degrees
+// 15 seconds       = 90 degrees
+// 
+// Degrees of rotation per second = 6 degrees
+// CurrentTimeInSeconds * 6 = Degrees of rotation for second hand.
 //
 // GameObjects need to be rotated on the Z axis.
 //
-// Degrees should be made negative, as positive rotations are counter-clockwise.
+// Degrees of rotation should be made negative, as positive rotations are counter-clockwise.
 
 public class AnalogClockScript : MonoBehaviour
 {
     Image hourHand;
+    static string hourHandName = "HourHand";
+    const float hourHandSecondToDegreesRatio = 0.008333333f;
+    // Represents how many degrees per second the hour hand rotates.
+
     Image minuteHand;
+    static string minuteHandName = "MinuteHand";
+    const float minuteHandSecondToDegreesRatio = 0.1f;
+    // Represents how many degrees per second the minute hand rotates.
+
     Image secondHand;
+    static string secondHandName = "SecondHand";
+    const float secondHandSecondToDegreesRatio = 6f;
+    // Represents how many degrees per second the second hand rotates.
+
     GameObject pivotPoint;
+    static string pivotPointName = "PivotPoint";
 
     void Start()
     {
         Debug.Log(DateTime.Now.TimeOfDay.TotalSeconds / 86400);
 
-        hourHand = GameObject.Find("HourHand").GetComponent<Image>();
-        // minuteHand = GameObject.Find("MinuteHand").GetComponent<Image>();
-        // secondHand = GameObject.Find("SecondHand").GetComponent<Image>();
+        hourHand = GameObject.Find(hourHandName).GetComponent<Image>();
+        minuteHand = GameObject.Find(minuteHandName).GetComponent<Image>();
+        secondHand = GameObject.Find(secondHandName).GetComponent<Image>();
+        pivotPoint = GameObject.Find(pivotPointName);
 
-        pivotPoint = GameObject.Find("PivotPoint");
-
-        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -(5400f * 0.008333333f)); // 1:30 AM, 45 degrees
-        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -(10800f * 0.008333333f)); // 3:00 AM, 90 degrees
-        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -(21600f * 0.008333333f)); // 6:00 AM, 180 degrees
-
-        hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation());
+        hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(hourHand));
+        minuteHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(minuteHand));
+        secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(secondHand));
     }
 
     void Update()
@@ -60,8 +81,27 @@ public class AnalogClockScript : MonoBehaviour
         // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, GetDegreesOfRotation());
     }
 
-    static public float GetDegreesOfRotation()
+    static public float GetDegreesOfRotation(Image hand)
+    // Returns the degrees of rotation of the hand given for the current time.
     {
-        return (float)DateTime.Now.TimeOfDay.TotalSeconds * 0.008333333f;
+        if (hand.name == hourHandName)
+        // IF given the hour hand.
+        {
+            return (float)DateTime.Now.TimeOfDay.TotalSeconds * hourHandSecondToDegreesRatio;
+        }
+        else if (hand.name == minuteHandName)
+        // IF given the minute hand.
+        {
+            return (float)DateTime.Now.TimeOfDay.TotalSeconds * minuteHandSecondToDegreesRatio;
+        }
+        else if (hand.name == secondHandName)
+        // IF given the second hand.
+        {
+            return (float)DateTime.Now.TimeOfDay.TotalSeconds * secondHandSecondToDegreesRatio;
+        }
+
+        // If reached this point, something has gone wrong.
+        Debug.Log("ERROR: Unable to calculate degrees of rotation. Are the clock hands named correctly?");
+        return 0f;
     }
 }
