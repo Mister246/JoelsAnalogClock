@@ -73,31 +73,35 @@ public class AnalogClockScript : MonoBehaviour
         hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(hourHand));
         minuteHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(minuteHand));
         secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(secondHand));
+
+        Debug.Log(-GetDegreesOfRotation(secondHand));
+        // Debug.Log(-GetDegreesOfRotation(secondHand) - secondHand.transform.eulerAngles.z);
     }
 
     void Update()
     {
-        // Debug.Log(GetDegreesOfRotation());
-        // hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, GetDegreesOfRotation());
+        // Debug.Log(-GetDegreesOfRotation(secondHand) - secondHand.transform.eulerAngles.z);
+        // secondHand.transform.rotation = Quaternion.Euler(0f, 0f, -GetDegreesOfRotation(secondHand) + secondHand.transform.rotation.z);
     }
 
     static public float GetDegreesOfRotation(Image hand)
     // Returns the degrees of rotation of the hand given for the current time.
+    // Degrees of rotation returned are between 0 and 360. 
     {
         if (hand.name == hourHandName)
         // IF given the hour hand.
         {
-            return (float)DateTime.Now.TimeOfDay.TotalSeconds * hourHandSecondToDegreesRatio;
+            return (float)DateTime.Now.TimeOfDay.TotalSeconds * hourHandSecondToDegreesRatio % 360f;
         }
         else if (hand.name == minuteHandName)
         // IF given the minute hand.
         {
-            return (float)DateTime.Now.TimeOfDay.TotalSeconds * minuteHandSecondToDegreesRatio;
+            return (float)DateTime.Now.TimeOfDay.TotalSeconds * minuteHandSecondToDegreesRatio % 360f;
         }
         else if (hand.name == secondHandName)
         // IF given the second hand.
         {
-            return (float)DateTime.Now.TimeOfDay.TotalSeconds * secondHandSecondToDegreesRatio;
+            return (float)DateTime.Now.TimeOfDay.TotalSeconds * secondHandSecondToDegreesRatio % 360f;
         }
 
         // If reached this point, something has gone wrong.
