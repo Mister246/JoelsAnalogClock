@@ -10,15 +10,7 @@ using UnityEngine.UI;
 // 
 // Hour hand time table:
 // 0 seconds        = 0 degrees
-// 5400 seconds     = 45 degrees
 // 10,800 seconds   = 90 degrees
-// 21,600 seconds   = 180 degrees
-// 32,400 seconds   = 270 degrees
-// 43,200 seconds   = 360 degrees / 0 degrees
-// 54,000 seconds   = 90 degrees
-// 64,800 seconds   = 180 degrees
-// 75,600 seconds   = 270 degrees
-// 86,400 seconds   = 360 degrees / 0 degrees
 //
 // Degrees of rotation per second = 0.008333333 degrees
 // CurrentTimeInSeconds * 0.008333333 = Degrees of rotation for hour hand.
@@ -57,41 +49,29 @@ public class AnalogClockScript : MonoBehaviour
     static string secondHandName = "SecondHand";
     const float secondHandSecondToDegreesRatio = 6f;
     // Represents how many degrees per second the second hand rotates.
-    float secondHandDeltaRotation;
-    // Represents the difference in rotation between this frame and last frame for the second hand.
-
-    GameObject pivotPoint;
-    static string pivotPointName = "PivotPoint";
 
     float currentTime;
 
     void Start()
     {
         Application.runInBackground = true;
+        Screen.SetResolution(1220, 700, FullScreenMode.Windowed, 144);
 
         currentTime = (float)DateTime.Now.TimeOfDay.TotalSeconds;
 
         hourHand = GameObject.Find(hourHandName).GetComponent<Image>();
         minuteHand = GameObject.Find(minuteHandName).GetComponent<Image>();
         secondHand = GameObject.Find(secondHandName).GetComponent<Image>();
-        pivotPoint = GameObject.Find(pivotPointName);
-
-        hourHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(hourHand, currentTime));
-        minuteHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(minuteHand, currentTime));
-        secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, -GetDegreesOfRotation(secondHand, currentTime));
-
-        secondHandDeltaRotation = -GetDegreesOfRotation(secondHand, currentTime) + GetDegreesOfRotation(secondHand, currentTime - Time.fixedDeltaTime);
-        // Represents the difference in rotation between this frame and last frame for the second hand.
-
-        // Debug.Log(-GetDegreesOfRotation(secondHand));
-        // Debug.Log(-GetDegreesOfRotation(secondHand) - secondHand.transform.eulerAngles.z);
     }
 
     void FixedUpdate()
     {
         currentTime = (float)DateTime.Now.TimeOfDay.TotalSeconds;
 
-        secondHand.transform.RotateAround(pivotPoint.transform.position, Vector3.forward, secondHandDeltaRotation);
+        hourHand.transform.rotation = Quaternion.Euler(0f, 0f, -GetDegreesOfRotation(hourHand, currentTime) + 90f);
+        minuteHand.transform.rotation = Quaternion.Euler(0f, 0f, -GetDegreesOfRotation(minuteHand, currentTime) + 90f);
+        secondHand.transform.rotation = Quaternion.Euler(0f, 0f, -GetDegreesOfRotation(secondHand, currentTime) + 90f);
+        // All rotations are offset by 90 degrees due to all three hand's starting position. 
     }
 
     static public float GetDegreesOfRotation(Image hand, float currentTime)
